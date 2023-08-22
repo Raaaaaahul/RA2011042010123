@@ -1,15 +1,13 @@
-import logo from './logo.svg';
-import './App.css';
-import CheckboxComponent from './components/CheckboxComponent';
+import CheckboxList from "./components/CheckboxComponent";
 
-
-function App() {
+export default function App() {
   return (
     <>
-    {/* <DataDisplay/> */}
-    <CheckboxComponent/>
+    <div className="flex justify-center">
+    <section className="m-5 border-4 border-gray-500 w-max p-4 ">
+      <CheckboxList/>
+    </section>
+    </div>
     </>
-  );
+  )
 }
-
-export default App;

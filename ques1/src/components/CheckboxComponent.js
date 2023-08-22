@@ -60,8 +60,8 @@ function CheckboxList() {
       <div className="fetched-data-container">
         <h2>Fetched Numbers:</h2>
         <ul className="fetched-data-list">
-          {fetchedNumbers.map((number, index) => (
-            <li key={index}>{number}</li>
+          {fetchedNumbers.map((number) => (
+            <li>{number}</li>
           ))}
         </ul>
       </div>
