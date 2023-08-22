@@ -1,65 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-function CheckboxComponent() {
-  const [checkboxes, setCheckboxes] = useState({
-    prime: false,
-    rand: false,
-    fib: false,
-    odd: false,
-  });
+function CheckboxList() {
+  const checkboxData = [
+    { name: 'prime', url: 'http://20.244.56.144/numbers/primes' },
+    { name: 'rand', url: 'http://20.244.56.144/numbers/rand' },
+    { name: 'fib', url: 'http://20.244.56.144/numbers/fibo' },
+    { name: 'odd', url: 'http://20.244.56.144/numbers/odd' },
+  ];
 
-  const handleCheckboxChange = (checkboxName) => {
-    setCheckboxes(prevCheckboxes => ({
-      ...prevCheckboxes,
-      [checkboxName]: !prevCheckboxes[checkboxName]
-    }));
-  }; 
+  const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
+  const [jsonData, setJsonData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const promises = selectedCheckboxes.map(async (url) => {
+        try {
+          const response = await axios.get(url);
+          return response.data;
+        } catch (error) {
+          console.error('Error fetching data from', url, error);
+          return null;
+        }
+      });
+
+      const fetchedData = await Promise.all(promises);
+      setJsonData(fetchedData.filter(item => item !== null));
+    };
+
+    if (selectedCheckboxes.length > 0) {
+      fetchData();
+    } else {
+      setJsonData([]);
+    }
+  }, [selectedCheckboxes]);
+
+  const handleCheckboxChange = (checkboxName, checkboxUrl) => {
+    if (selectedCheckboxes.includes(checkboxUrl)) {
+      setSelectedCheckboxes(prevSelected => prevSelected.filter(url => url !== checkboxUrl));
+    } else {
+      setSelectedCheckboxes(prevSelected => [...prevSelected, checkboxUrl]);
+    }
+  };
+
+  console.log('Selected URLs:', selectedCheckboxes);
+
   return (
     <div>
-      <label>
-        <input
-          type="checkbox"
-          checked={checkboxes.prime}
-          onChange={() => handleCheckboxChange('prime')}
-        />
-        Prime
-      </label>
-      <br />
-      <label>
-        <input
-          type="checkbox"
-          checked={checkboxes.rand}
-          onChange={() => handleCheckboxChange('rand')}
-        />
-        Random
-      </label>
-      <br />
-      <label>
-        <input
-          type="checkbox"
-          checked={checkboxes.fib}
-          onChange={() => handleCheckboxChange('fib')}
-        />
-        Fibonacci
-      </label>
-      <br />
-      <label>
-        <input
-          type="checkbox"
-          checked={checkboxes.odd}
-          onChange={() => handleCheckboxChange('odd')}
-        />
-        Odd
-      </label>
-      <br />
+      {checkboxData.map(checkbox => (
+        <label key={checkbox.name}>
+          <input
+            type="checkbox"
+            checked={selectedCheckboxes.includes(checkbox.url)}
+            onChange={() => handleCheckboxChange(checkbox.name, checkbox.url)}
+          />
+          {checkbox.name}
+        </label>
+      ))}
       <div>
-        {checkboxes.prime && <p>Prime URL: http://20.244.56.144/numbers/primes</p>}
-        {checkboxes.rand && <p>Random URL: http://20.244.56.144/numbers/rand</p>}
-        {checkboxes.fib && <p>Fibonacci URL: http://20.244.56.144/numbers/fib</p>}
-        {checkboxes.odd && <p>Odd URL: http://20.244.56.144/numbers/odd</p>}
+        <h2>JSON Data:</h2>
+        <pre>{JSON.stringify(jsonData, null, 2)}</pre>
       </div>
     </div>
   );
 }
 
-export default CheckboxComponent;
+export default CheckboxList;
